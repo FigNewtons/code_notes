@@ -1,0 +1,304 @@
+/**
+
+    Red-black tree
+    Self-balancing BST
+
+    MIT Introduction to Algorithms - Ch 13
+
+    Properties:
+      1. Every node is either red or black
+      2. The root is black
+      3. Every leaf (NIL/ null) is black
+      4. If a node is red, then both of its children is black.
+      5. For each node, all descendant paths have the same
+         number of black nodes.
+
+    Terms:
+      o black-height(bh(x)) - the number of black nodes in a
+        subtree rooted at node x (includes nils, which are leaves,
+        but not x itself)
+
+    Lemma: A red-black tree with n internal nodes has height
+    at most 2lg(n+1).
+
+
+*/
+
+public class RedBlack{
+
+    private Node root, nil;
+
+    private enum Color{BLACK, RED}
+
+    private class Node{
+        Integer value;
+        Color color;
+        Node left, right, parent;
+
+
+        public Node(Integer v){
+            value = v;
+
+            if(v == null)
+              color = Color.BLACK;
+            else
+              color = Color.RED;
+
+            parent = left = right = nil;
+        }
+
+        public Node(Integer v, Node p){
+            value = v;
+            color = Color.RED;
+            parent = p;
+            left = right = nil;
+        }
+
+        public void setValue(int v){value = v;}
+        public void setColor(Color c){color = c;}
+        public void setLeft(Node l){left = l;}
+        public void setRight(Node r){right = r;}
+        public void setParent(Node p){parent = p;}
+
+        public Integer value(){return value;}
+        public Color color(){return color;}
+        public Node left(){return left;}
+        public Node right(){return right;}
+        public Node parent(){return parent;}
+    }
+
+    public RedBlack(){
+        root = nil = new Node(null);
+    }
+
+    // Assumes x has a right child (not nil)
+    // and that root.parent() == nil
+    // O(1) time
+    private void leftRotate(Node x){
+        Node y = x.right();
+        x.setRight(y.left());
+
+        // If y's left child is not nil
+        // its parent as x
+        if(y.left().value() != null)
+            y.left().setParent(x);
+
+        y.setParent(x.parent());
+
+        if(x.parent() == null)
+            root = y;
+        else if (x == x.parent().left())
+            x.parent().setLeft(y);
+        else
+            x.parent().setRight(y);
+
+        y.setLeft(x);
+        x.setParent(y);
+    }
+
+    // Assumes y has a left child (not nil)
+    // and that root.parent() == nil
+    // O(1) time
+    private void rightRotate(Node y){
+        Node x = y.left();
+        y.setLeft(x.right());
+
+        if(x.right().value() != null)
+            x.right().setParent(y);
+
+        x.setParent(y.parent());
+
+        if(y.parent() == null)
+            root = x;
+        else if(y == y.parent().left())
+            y.parent().setLeft(x);
+        else
+            y.parent().setRight(x);
+
+        x.setRight(y);
+        y.setParent(x);
+    }
+
+    // TODO: Fix this method!
+    private void insertRecolor(Node z){
+        while(z.parent().color == Color.RED){
+            if(z.parent() == z.parent().parent().left()){
+                Node y = z.parent().parent().right();
+
+                // Case 1: z's uncle y is red
+                if(y.color() == Color.RED){
+                    // Set parent and uncle as black, and grandparent as red
+                    z.parent().setColor(Color.BLACK);
+                    y.parent().setColor(Color.BLACK);
+                    z.parent().parent().setColor(Color.RED);
+
+                    z = z.parent().parent();
+                }else{
+
+                    // Case 2: z's uncle y is black and z is a right child
+                    // Rotate z's parent to transform into case 3
+                    if(z == z.parent().right()){
+                        z = z.parent();
+                        leftRotate(z);
+                    }
+                    // Case 3: z's uncle y is black and z is a left child
+                    z.parent().setColor(Color.BLACK);
+                    z.parent().parent().setColor(Color.RED);
+                    rightRotate(z.parent().parent());
+                }
+            // Symmetric to the above three cases
+            }else{
+                Node y = z.parent().parent().left();
+
+                if(y.color() == Color.RED){
+                    z.parent().setColor(Color.BLACK);
+                    y.parent().setColor(Color.BLACK);
+                    z.parent().parent().setColor(Color.RED);
+
+                    z = z.parent().parent();
+                }else{
+                    if(z == z.parent().left()){
+                        z = z.parent();
+                        rightRotate(z);
+                    }
+
+                    z.parent().setColor(Color.BLACK);
+                    z.parent().parent().setColor(Color.RED);
+                    leftRotate(z.parent().parent());
+                }
+            }
+        }
+
+        root.setColor(Color.BLACK);
+    }
+
+
+    // Takes O(lg n) time
+    public void insert(Integer value){
+        Node x = root;
+        Node y = nil;
+        Node z = new Node(value);
+
+        // Traverse tree
+        while(x != nil){
+            y = x;
+            if(z.value() < y.value())
+                x = x.left();
+            else
+                x = x.right();
+        }
+
+        z.setParent(y);
+
+        if(y == nil)
+            root = z;
+        else if(z.value() < y.value())
+            y.setLeft(z);
+        else
+            y.setRight(z);
+
+        //insertRecolor(z);
+    }
+
+    // TODO: Deletion / deleteRecolor methods
+    public void delete(int value){}
+
+    public Node root(){return root;}
+
+    // Returns maximum integer in tree
+    public Integer max(){
+        Node x = root;
+        Integer m = null;
+
+        while(x != nil){
+            m = x.value();
+            x = x.right();
+        }
+
+        return m;
+    }
+
+    // Returns minimum integer in tree
+    public Integer min(){
+        Node x = root;
+        Integer m = null;
+
+        while(x != nil){
+            m = x.value();
+            x = x.left();
+        }
+
+        return m;
+    }
+
+    // Preorder traversal
+    private void preorder(Node r){
+        if(r == nil) return;
+        else{
+            System.out.printf("Value: %4d\tColor: %5s\n", r.value(), r.color());
+            preorder(r.left());
+            preorder(r.right());
+        }
+    }
+
+    // Inorder traversal
+    private void inorder(Node r){
+        if(r == nil) return;
+        else{
+          inorder(r.left());
+          System.out.printf("Value: %4d\tColor: %5s\n", r.value(), r.color());
+          inorder(r.right());
+        }
+    }
+
+    // Postorder traversal
+    private void postorder(Node r){
+        if(r == nil) return;
+        else{
+            postorder(r.left());
+            postorder(r.right());
+            System.out.printf("Value: %4d\tColor: %5s\n", r.value(), r.color());
+        }
+    }
+
+    public void print(String option){
+
+        System.out.println(option + " Traversal");
+
+        switch(option){
+            case "Preorder":
+                preorder(root);
+                break;
+            case "Inorder":
+                inorder(root);
+                break;
+            case "Postorder":
+                postorder(root);
+                break;
+            default:
+                System.out.println("Invalid option.");
+        }
+
+        System.out.println(" ");
+
+    }
+
+    public static void main(String[] args){
+
+        RedBlack rb = new RedBlack();
+        rb.insert(26);
+        rb.insert(17);
+        rb.insert(41);
+        rb.insert(14);
+        rb.insert(21);
+        rb.insert(30);
+        rb.insert(47);
+
+        rb.print("Preorder");
+        rb.print("Inorder");
+        rb.print("Postorder");
+
+        System.out.printf("Minimum value: %4d\n", rb.min());
+        System.out.printf("Maximum value: %4d\n", rb.max());
+    }
+}
