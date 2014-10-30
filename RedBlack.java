@@ -23,6 +23,7 @@
 
 
 */
+import java.util.*;
 
 public class RedBlack{
 
@@ -85,7 +86,7 @@ public class RedBlack{
 
         y.setParent(x.parent());
 
-        if(x.parent() == null)
+        if(x.parent() == nil)
             root = y;
         else if (x == x.parent().left())
             x.parent().setLeft(y);
@@ -108,7 +109,7 @@ public class RedBlack{
 
         x.setParent(y.parent());
 
-        if(y.parent() == null)
+        if(y.parent() == nil)
             root = x;
         else if(y == y.parent().left())
             y.parent().setLeft(x);
@@ -119,7 +120,6 @@ public class RedBlack{
         y.setParent(x);
     }
 
-    // TODO: Fix this method!
     private void insertRecolor(Node z){
         while(z.parent().color == Color.RED){
             if(z.parent() == z.parent().parent().left()){
@@ -172,6 +172,16 @@ public class RedBlack{
         root.setColor(Color.BLACK);
     }
 
+    private void deleteRecolor(Node x){
+        while(x != root && x.color() == Color.BLACK){
+            Node w;
+            if(x == x.parent().left()){
+                w = x.parent().right();
+
+            }
+
+        }
+    }
 
     // Takes O(lg n) time
     public void insert(Integer value){
@@ -197,13 +207,97 @@ public class RedBlack{
         else
             y.setRight(z);
 
-        //insertRecolor(z);
+        insertRecolor(z);
     }
 
     // TODO: Deletion / deleteRecolor methods
-    public void delete(int value){}
+    public void delete(Integer value){
+        Node z = find(value);
+        Node y = z;
+        Node x;
+
+        Color y_original = y.color();
+
+        // If z has less than 2 children
+        if(z.left() == nil){
+            x = z.right();
+            transplant(z, z.right());
+        }else if(z.right() == nil){
+            x = z.left();
+            transplant(z, z.left());
+        // If z has 2 children
+        }else{
+            // Get the Node of min value in z's right subtree
+            // y is the successor of z now
+            y = min(z.right());
+            y_original = y.color();
+
+            x = y.right();
+            if(y.parent() == z)
+                x.setParent(y);
+            else{
+                if(y != nil) transplant(y, y.right());
+                y.setRight(z.right());
+                y.right().setParent(y);
+            }
+
+            transplant(z,y);
+            y.setLeft(z.left());
+            y.left().setParent(y);
+            y.setColor(z.color());
+        }
+
+        //if(y_original == Color.BLACK)
+        //    deleteRecolor(x);
+    }
+
+    // Swap node x and y
+    private void transplant(Node x, Node y){
+        if(x.parent() == nil)
+            root = y;
+        else if(x == x.parent().left())
+            x.parent().setLeft(y);
+        else
+            x.parent().setRight(y);
+
+        y.setParent(x.parent());
+    }
+
+    // Returns node with given value
+    // and nil otherwise
+    private Node find(int value){
+        Node x = root;
+
+        while(x != nil){
+            if(x.value() == value)
+                return x;
+            else if(x.value() > value)
+                x = x.left();
+            else
+                x = x.right();
+        }
+
+        return nil;
+    }
+
 
     public Node root(){return root;}
+
+    private Node min(Node x){
+
+        while(x != nil)
+            x = x.left();
+
+        return x;
+    }
+
+    private Node max(Node x){
+
+        while(x != nil)
+            x = x.right();
+
+        return x;
+    }
 
     // Returns maximum integer in tree
     public Integer max(){
@@ -286,17 +380,20 @@ public class RedBlack{
     public static void main(String[] args){
 
         RedBlack rb = new RedBlack();
-        rb.insert(26);
-        rb.insert(17);
-        rb.insert(41);
-        rb.insert(14);
-        rb.insert(21);
-        rb.insert(30);
-        rb.insert(47);
 
-        rb.print("Preorder");
+        Random rand = new Random();
+
+        System.out.println("Inserting values...\n");
+        for(int i = 0; i < 100; i++){
+            int n = rand.nextInt(100) + 1;
+            rb.insert(n);
+        }
+
+        //rb.print("Preorder");
         rb.print("Inorder");
-        rb.print("Postorder");
+        //rb.print("Postorder");
+
+        rb.delete(rb.min());
 
         System.out.printf("Minimum value: %4d\n", rb.min());
         System.out.printf("Maximum value: %4d\n", rb.max());
