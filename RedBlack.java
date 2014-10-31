@@ -120,9 +120,8 @@ public class RedBlack{
         y.setParent(x);
     }
 
-    // TODO: Balancing not working
     private void insertRecolor(Node z){
-        while(z.parent().color == Color.RED){
+        while(z.parent().color() == Color.RED){
             if(z.parent() == z.parent().parent().left()){
                 Node y = z.parent().parent().right();
 
@@ -130,7 +129,7 @@ public class RedBlack{
                 if(y.color() == Color.RED){
                     // Set parent and uncle as black, and grandparent as red
                     z.parent().setColor(Color.BLACK);
-                    y.parent().setColor(Color.BLACK);
+                    y.setColor(Color.BLACK);
                     z.parent().parent().setColor(Color.RED);
 
                     z = z.parent().parent();
@@ -153,7 +152,7 @@ public class RedBlack{
 
                 if(y.color() == Color.RED){
                     z.parent().setColor(Color.BLACK);
-                    y.parent().setColor(Color.BLACK);
+                    y.setColor(Color.BLACK);
                     z.parent().parent().setColor(Color.RED);
 
                     z = z.parent().parent();
@@ -162,7 +161,6 @@ public class RedBlack{
                         z = z.parent();
                         rightRotate(z);
                     }
-
                     z.parent().setColor(Color.BLACK);
                     z.parent().parent().setColor(Color.RED);
                     leftRotate(z.parent().parent());
@@ -172,16 +170,73 @@ public class RedBlack{
 
         root.setColor(Color.BLACK);
     }
-
+    // TODO: Fix null pointer exception that occurs when this is called
     private void deleteRecolor(Node x){
         while(x != root && x.color() == Color.BLACK){
             Node w;
             if(x == x.parent().left()){
                 w = x.parent().right();
 
-            }
+                // Case 1
+                if(w.color() == Color.RED){
+                    w.setColor(Color.BLACK);
+                    x.parent().setColor(Color.RED);
+                    leftRotate(x.parent());
+                    w = x.parent().right();
+                }
+                // Case 2
+                if(w.left().color() == Color.BLACK &&
+                        w.right().color() == Color.BLACK){
+                    w.setColor(Color.RED);
+                    x = x.parent();
+                }else{
+                    // Case 3
+                    if(w.right().color() == Color.BLACK){
+                        w.left().setColor(Color.BLACK);
+                        w.setColor(Color.RED);
+                        rightRotate(w);
+                        w = x.parent().right();
+                    }
+                    // Case 4
+                    w.setColor(x.parent().color());
+                    x.parent().setColor(Color.BLACK);
+                    w.right().setColor(Color.BLACK);
+                    leftRotate(x.parent());
+                    x = root;
+                }
+            // Symmetric to above four cases
+            }else{
+                w = x.parent().left();
 
+                if(w.color() == Color.RED){
+                    w.setColor(Color.BLACK);
+                    x.parent().setColor(Color.RED);
+                    rightRotate(x.parent());
+                    w = x.parent().left();
+                }
+
+                if(w.right().color() == Color.BLACK &&
+                          w.left().color() == Color.BLACK){
+                    w.setColor(Color.RED);
+                    x = x.parent();
+                }else{
+
+                    if(w.left().color() == Color.BLACK){
+                        w.right().setColor(Color.BLACK);
+                        w.setColor(Color.RED);
+                        leftRotate(w);
+                        w = x.parent().left();
+                    }
+
+                    w.setColor(x.parent().color());
+                    x.parent().setColor(Color.BLACK);
+                    w.right().setColor(Color.BLACK);
+                    rightRotate(x.parent());
+                    x = root;
+                }
+            }
         }
+        x.setColor(Color.BLACK);
     }
 
     // Takes O(lg n) time
@@ -208,7 +263,7 @@ public class RedBlack{
         else
             y.setRight(z);
 
-        //insertRecolor(z);
+        insertRecolor(z);
     }
 
     // TODO: Deletion / deleteRecolor methods
@@ -248,8 +303,8 @@ public class RedBlack{
             y.setColor(z.color());
         }
 
-        //if(y_original == Color.BLACK)
-        //    deleteRecolor(x);
+        if(y_original == Color.BLACK)
+            deleteRecolor(x);
     }
 
     // Swap node x and y
@@ -385,16 +440,16 @@ public class RedBlack{
         Random rand = new Random();
 
         System.out.println("Inserting values...\n");
-        for(int i = 0; i < 100; i++){
+        for(int i = 1; i < 100; i++){
             int n = rand.nextInt(100) + 1;
             rb.insert(n);
         }
 
-        rb.print("Preorder");
-        //rb.print("Inorder");
+        //rb.print("Preorder");
+        rb.print("Inorder");
         //rb.print("Postorder");
 
-        //rb.delete(rb.min());
+        rb.delete(rb.min());
 
         System.out.printf("Minimum value: %4d\n", rb.min());
         System.out.printf("Maximum value: %4d\n", rb.max());
