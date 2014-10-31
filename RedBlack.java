@@ -120,6 +120,7 @@ public class RedBlack{
         y.setParent(x);
     }
 
+    // TODO: Balancing not working
     private void insertRecolor(Node z){
         while(z.parent().color == Color.RED){
             if(z.parent() == z.parent().parent().left()){
@@ -207,7 +208,7 @@ public class RedBlack{
         else
             y.setRight(z);
 
-        insertRecolor(z);
+        //insertRecolor(z);
     }
 
     // TODO: Deletion / deleteRecolor methods
@@ -389,11 +390,11 @@ public class RedBlack{
             rb.insert(n);
         }
 
-        //rb.print("Preorder");
-        rb.print("Inorder");
+        rb.print("Preorder");
+        //rb.print("Inorder");
         //rb.print("Postorder");
 
-        rb.delete(rb.min());
+        //rb.delete(rb.min());
 
         System.out.printf("Minimum value: %4d\n", rb.min());
         System.out.printf("Maximum value: %4d\n", rb.max());
