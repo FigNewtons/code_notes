@@ -2,9 +2,6 @@
     ICPC Problem E: Not Sew Difficult
     Mid-Altantic Regionals 2014
 
-    Solution in O(n * k) time where n is
-    the number of rectangles and k is the max range
-    of any given interval
 */
 
 
@@ -39,7 +36,7 @@ public class Sew{
         public Point tr(){return tr;}
         public Point br(){return br;}
         public Point tl(){return tl;}
-        public boolean inRectangle(int x, int y){
+        public boolean inRectangle(double x, double y){
             if(bl.x() < x && x < br.x() && bl.y() < y && y < tl.y())
                 return true;
 
@@ -77,35 +74,56 @@ public class Sew{
             }
 
             int x_max = 1, y_max = 1;
-            int x_index = 0, y_index = 0;
+
+			// Store points to check
+			ArrayList<Integer> x_index = new ArrayList<Integer>();
+			ArrayList<Integer> y_index = new ArrayList<Integer>();
 
             for(int i = 0; i < x_axis.length; i++){
+
                 if(x_axis[i] > x_max){
                     x_max = x_axis[i];
-                    x_index = i;
-                }
+					x_index.clear();
+                    x_index.add(i);
+                }else if(x_axis[i] == x_max){
+					x_index.add(i);
+				}
             }
-
+			
             for(int i = 0; i < y_axis.length; i++){
                 if(y_axis[i] > y_max){
                     y_max = y_axis[i];
-                    y_index = i;
-                }
+					y_index.clear();
+                    y_index.add(i);
+                }else if(y_axis[i] == y_max){
+					y_index.add(i);
+				}
             }
 
             int max = x_max > y_max ? y_max : x_max;
+			int num_intersections = 0;
 
             //Final check
-            int c = 0;
-            for(Rectangle r: rectangles){
-                if(r.inRectangle(x_index, y_index))
-                    c++;
-            }
+			if(max > 1){
+				for(Integer x_i : x_index){
+					for(Integer y_i : y_index){
+						int c = 0;
+						for(Rectangle r: rectangles){
+                			if(r.inRectangle(x_i + 0.1, y_i + 0.1)){                   			
+								c++;
+							}
+            			}
+						if(max == c){ 
+							num_intersections = max;
+							break;
+						}else if(max > c){
+							num_intersections = c;
+						}	
+					}
+				}
+			}
 
-            int answer = max != c ? c : max;
-            answer++;
-
-            System.out.println(answer);
+            System.out.println(num_intersections);
 
             numRect = in.nextInt();
         }
