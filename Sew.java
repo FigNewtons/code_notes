@@ -65,69 +65,70 @@ public class Sew{
 
                 rectangles[i] = new Rectangle(x1,y1,x2,y2);
 
+                // Range search both axes
                 for(int j = x1; j < x2; j++){
                     x_axis[j]++;
                 }
                 for(int j = y1; j < y2; j++){
                     y_axis[j]++;
                 }
-            }
-
-            int x_max = 1, y_max = 1;
-
-			// Store points to check
-			ArrayList<Integer> x_index = new ArrayList<Integer>();
-			ArrayList<Integer> y_index = new ArrayList<Integer>();
-
-            for(int i = 0; i < x_axis.length; i++){
-
-                if(x_axis[i] > x_max){
-                    x_max = x_axis[i];
-					x_index.clear();
-                    x_index.add(i);
-                }else if(x_axis[i] == x_max){
-					x_index.add(i);
-				}
-            }
-			
-            for(int i = 0; i < y_axis.length; i++){
-                if(y_axis[i] > y_max){
-                    y_max = y_axis[i];
-					y_index.clear();
-                    y_index.add(i);
-                }else if(y_axis[i] == y_max){
-					y_index.add(i);
-				}
-            }
-
-            int max = x_max > y_max ? y_max : x_max;
-			int num_intersections = 0;
-
-            //Final check
-			if(max > 1){
-				for(Integer x_i : x_index){
-					for(Integer y_i : y_index){
-						int c = 0;
-						for(Rectangle r: rectangles){
-                			if(r.inRectangle(x_i + 0.1, y_i + 0.1)){                   			
-								c++;
-							}
-            			}
-						if(max == c){ 
-							num_intersections = max;
-							break;
-						}else if(max > c){
-							num_intersections = c;
-						}	
-					}
-				}
-			}
-
-            System.out.println(num_intersections);
-
-            numRect = in.nextInt();
         }
-        in.close();
-    }
 
+			  // Store points to check
+			  ArrayList<Integer> x_index = new ArrayList<Integer>();
+			  ArrayList<Integer> y_index = new ArrayList<Integer>();
+        int x_max = 1, y_max = 1;
+
+        // Get max value from x-axis
+        for(int i = 0; i < x_axis.length; i++){
+            if(x_axis[i] > x_max){
+                x_max = x_axis[i];
+					      x_index.clear();
+                x_index.add(i);
+            }else if(x_axis[i] == x_max){
+					      x_index.add(i);
+				    }
+        }
+
+        // Get max value from y-axis
+        for(int i = 0; i < y_axis.length; i++){
+            if(y_axis[i] > y_max){
+                y_max = y_axis[i];
+					      y_index.clear();
+                y_index.add(i);
+            }else if(y_axis[i] == y_max){
+					      y_index.add(i);
+				    }
+        }
+
+        int max = x_max > y_max ? y_max : x_max;
+			  int num_intersections = 0;
+
+        //Final check
+			  if(max > 1){
+			      for(Integer x_i : x_index){
+					      for(Integer y_i : y_index){
+						        int c = 0;
+						        for(Rectangle r: rectangles){
+                        if(r.inRectangle(x_i + 0.1, y_i + 0.1)){
+								            c++;
+							          }
+            		    }
+
+					          if(max == c){
+							          num_intersections = max;
+							          break;
+						        }else if(max > c){
+							          num_intersections = c;
+						        }
+					      }
+				     }
+			   }
+
+         System.out.println(num_intersections);
+
+         numRect = in.nextInt();
+      }
+      in.close();
+    }
 }

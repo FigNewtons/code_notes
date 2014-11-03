@@ -171,33 +171,36 @@ public class RedBlack{
         root.setColor(Color.BLACK);
     }
     // TODO: Fix null pointer exception that occurs when this is called
+    // Exception occurs when multiple nodes have the same value and color
     private void deleteRecolor(Node x){
         while(x != root && x.color() == Color.BLACK){
             Node w;
             if(x == x.parent().left()){
+                // x's sibling
                 w = x.parent().right();
 
-                // Case 1
+                // Case 1: w is red
                 if(w.color() == Color.RED){
                     w.setColor(Color.BLACK);
                     x.parent().setColor(Color.RED);
                     leftRotate(x.parent());
                     w = x.parent().right();
                 }
-                // Case 2
+                // Case 2: w is black, and so are its children
                 if(w.left().color() == Color.BLACK &&
                         w.right().color() == Color.BLACK){
                     w.setColor(Color.RED);
                     x = x.parent();
                 }else{
-                    // Case 3
+                    // Case 3: w is black, left child is red,
+                    // right child is black
                     if(w.right().color() == Color.BLACK){
                         w.left().setColor(Color.BLACK);
                         w.setColor(Color.RED);
                         rightRotate(w);
                         w = x.parent().right();
                     }
-                    // Case 4
+                    // Case 4: w is black, and right child is red
                     w.setColor(x.parent().color());
                     x.parent().setColor(Color.BLACK);
                     w.right().setColor(Color.BLACK);
@@ -241,6 +244,9 @@ public class RedBlack{
 
     // Takes O(lg n) time
     public void insert(Integer value){
+        // No duplicate values
+        if(find(value) != nil) return;
+
         Node x = root;
         Node y = nil;
         Node z = new Node(value);
@@ -271,6 +277,9 @@ public class RedBlack{
         Node z = find(value);
         Node y = z;
         Node x;
+
+        // Node not in tree
+        if(z == nil) return;
 
         Color y_original = y.color();
 
